@@ -1,5 +1,8 @@
 import { Schema,model,Document } from 'mongoose'
 
+export interface Itables {
+    name:string
+}
 
 const RestaurantSchema = new Schema({
     name:{
@@ -17,7 +20,14 @@ const RestaurantSchema = new Schema({
     url:{
         type:String,
         required: 'URL can\'t be empty',
-    }
+    },
+    tables:[
+        {
+            name:{
+                type:String
+            }
+        }
+    ]
 });
 
 RestaurantSchema.path('url').validate((val:any)=>{
@@ -31,6 +41,7 @@ interface IRestaurant extends Document{
     direction:string;
     country:string;
     url:string;
+    tables: Array<Itables>
 }
 
-export const Prices = model<IRestaurant>('Prices',RestaurantSchema);
+export const Restaurants = model<IRestaurant>('Restaurants',RestaurantSchema);

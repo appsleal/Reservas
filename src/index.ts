@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import bodyParser from "body-parser";
 
 import cors from "cors";
+import RestaurantRoutes from "./routes/restaurant.routes";
+import BookingsRouter from './routes/bookings.routes';
 var cluster = require("cluster");
 
 const server = Server.instance;
@@ -24,7 +26,8 @@ server.app.use(bodyParser.urlencoded({ extended: true }));
 server.app.use(bodyParser.json());
 
 //rutas
-//server.app.use("/pacientes", pacienteRoutes);
+server.app.use("/restaurant", RestaurantRoutes);
+server.app.use("/booking", BookingsRouter);
 
 //conexion BD
 mongoose.connect(
