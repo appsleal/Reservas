@@ -85,7 +85,7 @@ RestaurantRoutes.post("/getByFirstLetter", (req: any, res: any) => {
 
 
 RestaurantRoutes.post("/getByCountry", (req: any, res: any) => {
-    if (req.body.letter) {
+    if (req.body.country) {
       Restaurants.find({country:req.body.country}).then((restaurant: any) => {
         if (restaurant) {
           res.json({
@@ -102,7 +102,7 @@ RestaurantRoutes.post("/getByCountry", (req: any, res: any) => {
     }else{
       res.json({
           ok: false,
-          restaurant: "Falto la letra",
+          restaurant: "Falto la ciudad",
         });
     }
   });
