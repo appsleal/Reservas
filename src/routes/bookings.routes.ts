@@ -24,56 +24,54 @@ BookingsRouter.post("/create", (req: any, res: any) => {
   //default 15 tables
   var datetime = new Date();
   var continuar = true;
-  datetime = datetime.toISOString().slice(0, 10);
+  var query1;
+  var result1;
+  datetime = Date.parse(req.body.date)
   Bookings.find({ date: datetime }).then((bookings) => {
     if (bookings.length <= 20) {
-        Restaurants.findOne({"_id":req.body.restaurant_id}).then((restaurante:any)=>{
-            if(restaurante){
-                restaurante.tables.forEach(async element => {
-                    if(continuar==true){
-                        await Bookings.findOne({"table_id":element._id, "date":datetime}).then( book=>{
-                            if(!book){
-                                req.body.table_id=element._id;
-                                req.body.date=datetime;
-                                console.log(req.body);
-                                continuar=false;
-                                Bookings.create(req.body)
-                                .then((booking) => {
-                                  if (booking) {
-                                    res.json({
-                                      ok: true,
-                                      error: "none",
-                                    });
-                                  } else {
-                                    res.json({
-                                      ok: true,
-                                      error: "Unknown",
-                                    });
-                                  }
-                                })
-                                .catch((err) => {
-                                  res.json({
-                                    ok: false,
-                                    error: err,
-                                  });
-                                });
-                            }
-                        })
-                    }else{
-                        res.json({
-                            ok: false,
-                            error: "restaurant full booking",
-                          });
-                    }
+      Restaurants.findOne({ _id: req.body.restaurant_id }).then(
+        async (restaurante: any) => {
+          if (restaurante) {
+            for await (const iterator of restaurante.tables) {
+              console.log(iterator)
+              if (continuar==true) {
+                query1 = await Bookings.findOne({
+                  table_id: iterator._id,
+                  date: datetime,
                 });
-      
-            }else{
-                res.json({
-                    ok: false,
-                    error: "restaurant not exist",
-                  });
+                if (query1) {
+                  console.log("ocupado");
+                } else {
+                  console.log("ejecutando");
+                  req.body.table_id = iterator._id;
+                  req.body.date = datetime;
+                  Bookings.create(req.body).then(booking=>{
+                    if (booking) {
+                      res.json({
+                        ok: true,
+                        error: "None",
+                        booking
+                      });
+                    } 
+                  })
+                  continuar = false;
+                }
+              }
             }
-        })
+            if (continuar) {
+              res.json({
+                ok: true,
+                error: "restaurant is full"
+              });
+            }
+          } else {
+            res.json({
+              ok: false,
+              error: "restaurant not exist",
+            });
+          }
+        }
+      );
     } else {
       res.json({
         ok: false,
@@ -81,10 +79,6 @@ BookingsRouter.post("/create", (req: any, res: any) => {
       });
     }
   });
-
-  
-
-  
 });
 
 export default BookingsRouter;
