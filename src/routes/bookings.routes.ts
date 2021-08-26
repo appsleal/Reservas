@@ -20,6 +20,25 @@ BookingsRouter.get("/get", (req: any, res: any) => {
   });
 });
 
+
+BookingsRouter.get("/getByRestaurant", (req: any, res: any) => {
+  Bookings.find({
+    restaurant_id:req.body.restaurant_id
+  }).then((booking: any) => {
+    if (booking) {
+      res.json({
+        ok: true,
+        booking,
+      });
+    } else {
+      res.json({
+        ok: false,
+        booking: "None",
+      });
+    }
+  });
+});
+
 BookingsRouter.post("/create", (req: any, res: any) => {
   //default 15 tables
   var datetime = new Date();
